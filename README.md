@@ -6,16 +6,6 @@ Report any bugs by opening an issue here: https://github.com/ygeszvain/GusPI/iss
 Quick start
 
 ```
-$ python3 -m pip install -U plotly
-
-$ python3 -m pip install -U scikit-learn
-
-$ python3 -m pip install -U matplotlib
-
-$ python3 -m pip install -U seaborn
-
-$ python3 -m pip install -U simfin
-
 $ python3 -m pip install -U GusPI
 ```
 
