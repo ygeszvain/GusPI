@@ -1,6 +1,7 @@
 
 .DS_Store
 .gitignore
+.idea/*
 GusPI.egg-info/*
 GusPI/.ipynb_checkpoints/*
 bin/*
