@@ -10,3 +10,4 @@ dist/*
 include/*
 lib/*
 setup.py
+.Python
