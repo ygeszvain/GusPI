@@ -4,7 +4,6 @@ import seaborn as sns
 import math
 import plotly.graph_objects as go
 import json
-# Import the simfin package and the Python shortcuts for the columns
 import simfin as sf
 from simfin.names import *
 
@@ -32,8 +31,8 @@ def prep_json(file):
 def prepare_finData(country):
     sf.set_api_key('free')
     sf.set_data_dir('~/simfin_data/')
-    df_companies = sf.load_companies(market=country)
-    df_industries = sf.load_industries()
+    sf.load_companies(market=country)
+    sf.load_industries()
     
 def get_annual_finData_income(country):
     prepare_finData(country)
@@ -111,9 +110,10 @@ def multiLineplot(dataframe,title):
 
     plt.show()
 
-def calculateMetrics(balanceSheet,incomeStatement):
-    balanceSheet=balanceSheet
-    incomeStatement=incomeStatement
+
+def calculateMetrics(balanceSheet, incomeStatement):
+    balanceSheet = balanceSheet
+    incomeStatement = incomeStatement
 
     frames = [balanceSheet, incomeStatement]
     Ratio = pd.DataFrame()
@@ -122,27 +122,41 @@ def calculateMetrics(balanceSheet,incomeStatement):
     dataframeForRatio['average_inventory'] = dataframeForRatio['inventories'].mean()
     dataframeForRatio['average_accounts_receivable'] = dataframeForRatio['accounts_&_notes_receivable'].mean()
 
-    #Liquidity Ratios
-    #Ratio['quick_ratio'] = (dataframeForRatio['Cash,_Cash_Equivalents_&_Short_Term_Investments']+dataframeForRatio['Accounts_&_Notes_Receivable']+dataframeForRatio['short_term_investments'])/dataframeForRatio['Total_Current_Liabilities']
-    Ratio['acid-test_ratio'] = dataframeForRatio['total_current_assets']/dataframeForRatio['total_current_liabilities']
-    Ratio['cash_ratio'] = (dataframeForRatio['total_current_assets']-dataframeForRatio['inventories'])/dataframeForRatio['total_current_liabilities']
+    # Liquidity Ratios
+    # Ratio['quick_ratio'] = (dataframeForRatio['Cash,_Cash_Equivalents_&_Short_Term_Investments']+dataframeForRatio['Accounts_&_Notes_Receivable']+dataframeForRatio['short_term_investments'])/dataframeForRatio['Total_Current_Liabilities']
+    Ratio['acid-test_ratio'] = dataframeForRatio['total_current_assets'] / dataframeForRatio[
+        'total_current_liabilities']
+    Ratio['cash_ratio'] = (dataframeForRatio['total_current_assets'] - dataframeForRatio['inventories']) / \
+                          dataframeForRatio['total_current_liabilities']
 
-    #Leverage Financial Ratios
-    Ratio['debt_ratio'] = dataframeForRatio['total_liabilities']/(dataframeForRatio['total_assets']-dataframeForRatio['total_liabilities'])
-    Ratio['interest_coverage_ratio'] = dataframeForRatio['gross_profit']/dataframeForRatio['interest_expense,_net']
-    #Ratio['debt_service_coverage_ratio'] = dataframeForRatio['gross_profit']/dataframeForRatio['']
+    # Leverage Financial Ratios
+    Ratio['debt_ratio'] = dataframeForRatio['total_liabilities'] / (
+                dataframeForRatio['total_assets'] - dataframeForRatio['total_liabilities'])
+    Ratio['debt_to_equity_ratio'] = dataframeForRatio['total_liabilities'] / dataframeForRatio['total_equity']
+    Ratio['interest_coverage_ratio'] = dataframeForRatio['gross_profit'] / dataframeForRatio['interest_expense,_net']
+    Ratio['current_ratio'] = dataframeForRatio['total_current_assets'] / dataframeForRatio['total_current_liabilities']
+    # Ratio['debt_service_coverage_ratio'] = dataframeForRatio['gross_profit']/dataframeForRatio['']
 
-    #Efficiency Ratios
-    Ratio['asset_turnover_ratio'] = dataframeForRatio['revenue']/dataframeForRatio['total_assets']
-    Ratio['inventory_turnover_ratio'] = dataframeForRatio['cost_of_revenue']/dataframeForRatio['average_inventory']
-    Ratio['receivables_turnover_ratio'] = dataframeForRatio['revenue']/dataframeForRatio['average_accounts_receivable']
-    Ratio['days_sales_in_inventory_ratio'] = 365/Ratio['inventory_turnover_ratio']
+    # Efficiency Ratios
+    Ratio['asset_to_sales_ratio'] = dataframeForRatio['total_assets'] / dataframeForRatio['revenue']
+    Ratio['asset_turnover_ratio'] = dataframeForRatio['revenue'] / dataframeForRatio['total_assets']
+    Ratio['inventory_turnover_ratio'] = dataframeForRatio['cost_of_revenue'] / dataframeForRatio['average_inventory']
+    Ratio['days_sales_in_inventory_ratio'] = 365 / Ratio['inventory_turnover_ratio']
+    Ratio['receivables_turnover_ratio'] = dataframeForRatio['revenue'] / dataframeForRatio[
+        'average_accounts_receivable']
+    Ratio['average_collection_period'] = 365 / Ratio['receivables_turnover_ratio']
+    Ratio['interest_coverage_ratio'] = dataframeForRatio['pretax_income_(loss),_adj.'] / dataframeForRatio[
+        'interest_expense,_net']
 
-    #Profitability Ratios
-    Ratio['gross_margin_ratio'] = dataframeForRatio['gross_profit']/dataframeForRatio['revenue']
-    Ratio['operating_margin_ratio'] = dataframeForRatio['net_income']/dataframeForRatio['revenue']
-    Ratio['return_on_assets_ratio'] = dataframeForRatio['net_income']/dataframeForRatio['revenue']
-    Ratio['return_on_equity_ratio'] = dataframeForRatio['net_income']/(dataframeForRatio['revenue']-dataframeForRatio['total_liabilities'])
+    # Profitability Ratios
+    Ratio['gross_margin_ratio'] = dataframeForRatio['gross_profit'] / dataframeForRatio['revenue']
+    Ratio['operating_margin_ratio'] = dataframeForRatio['net_income'] / dataframeForRatio['revenue']
+    Ratio['return_on_assets_ratio'] = dataframeForRatio['net_income'] / dataframeForRatio['revenue']
+    Ratio['return_on_equity_ratio'] = dataframeForRatio['net_income'] / (
+                dataframeForRatio['revenue'] - dataframeForRatio['total_liabilities'])
+    Ratio['net_working_capital'] = dataframeForRatio['total_current_assets'] - dataframeForRatio['total_liabilities']
+    Ratio['operating_margin'] = dataframeForRatio['operating_income_(loss)'] / dataframeForRatio['revenue']
+    Ratio['retention_ratio'] = dataframeForRatio['retained_earnings'] / dataframeForRatio['revenue']
 
     Ratio = Ratio.T
     Ratio = Ratio.round(4)
