@@ -66,7 +66,7 @@ def _get_expected_counts(total_count):
     return(result)
 
 #Plot
-def plot_benfordlaw(out, title='', figsize=(15,8)):
+def plot_benfordlaw(result, title='', figsize=(15,8)):
     fontsize=16
 
     data_percentage = result['percentage_emp']

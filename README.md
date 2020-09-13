@@ -385,6 +385,21 @@ Read financial statements from csv files and provide horizontal analysis for the
 finPy.horizontalAnalysisLastTwo(dataframe)
 ```
 
+## GusPI.statsPy
+
+```
+#Example
+
+#perform Benford's Law anamoly detection
+#dataframe from a csv file: GLACCT_sample.csv
+
+df = pd.read_csv("GLACCT_sample.csv")
+# (dataframe,colname to perform detection,target_colname,target_value)
+value_arr = statsPy.init_benfordlaw(df, 'TotalAmount', 'GLACCT', '11111')
+result = statsPy.process_benfordlaw(value_arr, alpha=0.3)
+statsPy.plot_benfordlaw(result)
+```
+
 ## GusPI.scraper
 
 The scrape package provides an easy way to scrape Yelp business info and Yelp reviews for a specific business.
