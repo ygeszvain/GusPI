@@ -347,7 +347,7 @@ Read financial statements from csv files and provide a line chart for analysis.
 #dataframe for statements
 #category from the dataframe such as revenue
 
-#print multiple line plots
+#print line plots
 finPy.lineplot(dataframe, '3 year BalanceSheet Graph')
 ```
 
@@ -359,7 +359,7 @@ Read financial statements from csv files and provide multiple line charts for an
 #dataframe for statements
 
 #print multiple line plots
-finPy.multilineplots(dataframe, '3 year BalanceSheet Graph')
+finPy.multiLineplot(dataframe, '3 year BalanceSheet Graph')
 ```
 
 Read financial statements from csv files and provide financial metrics for analysis.
