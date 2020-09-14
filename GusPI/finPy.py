@@ -158,7 +158,7 @@ def calculateMetrics(balanceSheet, incomeStatement):
 
     Ratio = Ratio.T
     Ratio = Ratio.round(4)
-    print(Ratio)
+    return Ratio
     
 def bulletChart(file,item):
     statement = prep_dataframe(file)
