@@ -374,6 +374,18 @@ Read financial statements from csv files and provide financial metrics for analy
 finPy.calculateMetrics(df_balancesheet,df_income)
 ```
 
+Get financial statements for a list of company symbols and provide financial metrics for analysis.
+
+```
+#Example
+
+#symbols = ['AAPL', 'MSFT', 'FIS']
+#mass = calculate_ratio_mass(symbols)
+
+#get financial matrics for multiple companies
+finPy.calculate_ratio_mass(symbols)
+```
+
 Read financial statements from csv files and provide horizontal analysis for the last two periods.
 
 ```

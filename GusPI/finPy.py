@@ -130,8 +130,6 @@ def calculateMetrics(balanceSheet, incomeStatement):
                           dataframeForRatio['total_current_liabilities']
 
     # Leverage Financial Ratios
-    Ratio['debt_ratio'] = dataframeForRatio['total_liabilities'] / (
-                dataframeForRatio['total_assets'] - dataframeForRatio['total_liabilities'])
     Ratio['debt_to_equity_ratio'] = dataframeForRatio['total_liabilities'] / dataframeForRatio['total_equity']
     Ratio['interest_coverage_ratio'] = dataframeForRatio['gross_profit'] / dataframeForRatio['interest_expense,_net']
     Ratio['current_ratio'] = dataframeForRatio['total_current_assets'] / dataframeForRatio['total_current_liabilities']
@@ -196,3 +194,22 @@ def horizontalAnalysisLastTwo(dataframe):
     statement_lastPeriods['Percentage(Increased/Decreased)'] = pd.Series(["{0:.2f}%".format(val * 100) for val in statement_lastPeriods['Percentage(Increased/Decreased)']], index = statement_lastPeriods.index)
     statement_lastPeriods.to_csv('horizontalAnalysisLastTwo.csv')
     print("Horizontal Analysis with Last two Periods", statement_lastPeriods, sep='\n')
+
+def _process_symbol(symbol: str):
+    df_income= get_annual_finData_by_symbol('income',symbol,'us')
+    df_balancesheet = get_annual_finData_by_symbol('balancesheet',symbol,'us')
+
+    ret = calculateMetrics(df_balancesheet,df_income)
+    ret = ret.T
+    ret = ret.reset_index()
+    ret = ret.rename(columns={'breakdown': 'fiscal_year'})
+    ret.insert(0, 'Ticker', symbol)
+    ret = ret.set_index(['Ticker','fiscal_year'])
+    return ret
+
+def calculate_ratio_mass(symbols):
+    concate = pd.DataFrame()
+    for symbol in symbols:
+        ratio = _process_symbol(symbol)
+        concate = pd.concat([concate, ratio])
+    return concate
