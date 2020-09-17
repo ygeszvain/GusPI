@@ -16,8 +16,9 @@ def prep_dataframe(file):
     statement.iloc[:, 0] = statement.iloc[:, 0].str.replace('&', '')
     statement.iloc[:, 0] = statement.iloc[:, 0].str.lower()
     statement = statement.set_index(statement.columns[0])
-    statement=statement.abs()
+    statement = statement.abs()
     return statement
+
 
 def prep_json(file):
     statement = prep_dataframe(file)
@@ -26,19 +27,22 @@ def prep_json(file):
     statement_json = json.dumps(parsed)
     return statement_json
 
-#period = annual, quarterly
-#country= us
+
+# period = annual, quarterly
+# country= us
 def prepare_finData(country):
     sf.set_api_key('free')
     sf.set_data_dir('~/simfin_data/')
     sf.load_companies(market=country)
     sf.load_industries()
-    
+
+
 def get_annual_finData_income(country):
     prepare_finData(country)
     df_income = sf.load_income(variant='annual', market=country)
     df_income.columns = df_income.columns.str.replace(' ', '_')
     return df_income
+
 
 def get_annual_finData_balance(country):
     prepare_finData(country)
@@ -46,13 +50,15 @@ def get_annual_finData_balance(country):
     df_balance.columns = df_balance.columns.str.replace(' ', '_')
     return df_balance
 
+
 def get_annual_finData_cashflow(country):
     prepare_finData(country)
     df_cashflow = sf.load_cashflow(variant='annual', market=country)
     df_cashflow.columns = df_cashflow.columns.str.replace(' ', '_')
     return df_cashflow
 
-def get_annual_finData_by_symbol(category,symbol,country):
+
+def get_annual_finData_by_symbol(category, symbol, country):
     try:
         if category == "income":
             df = get_annual_finData_income(country)
@@ -71,50 +77,50 @@ def get_annual_finData_by_symbol(category,symbol,country):
     except KeyError:
         print('Not a valid symbol')
 
+
 def printStatement(file):
     statement = prep_dataframe(file)
     print(statement)
 
-def lineplot(dataframe,category):
+
+def lineplot(dataframe, category):
     plotData = dataframe.T
     plotData = plotData.reset_index()
-    #plotData.columns[0]= pd.to_datetime(plotData.columns[0]) 
+    # plotData.columns[0]= pd.to_datetime(plotData.columns[0])
     plotData = plotData.sort_values(plotData.columns[0])
-    plotData = plotData[[plotData.columns[0],category]]
+    plotData = plotData[[plotData.columns[0], category]]
     plotData[category] = plotData[category].astype(float)
 
-    plt.figure(figsize=(20,9))
-    sns.lineplot(data=plotData, x=plotData.columns[0],y=category)
+    plt.figure(figsize=(20, 9))
+    sns.lineplot(data=plotData, x=plotData.columns[0], y=category)
 
-def multiLineplot(dataframe,title):
+
+def multiLineplot(dataframe, title):
     plotData = dataframe.T
     plotData = plotData.reset_index()
-    if len(str(plotData.iat[0, 0]))>4:
-        plotData['index']= pd.to_datetime(plotData['index'])
+    if len(str(plotData.iat[0, 0])) > 4:
+        plotData['index'] = pd.to_datetime(plotData['index'])
     plotData = plotData.sort_values(plotData.columns[0])
 
     columnsList = list(plotData.columns.values)
-    graphRowCount=math.ceil(len(plotData.columns)/3)
-    fig = plt.figure(figsize=(30,45))
+    graphRowCount = math.ceil(len(plotData.columns) / 3)
+    fig = plt.figure(figsize=(30, 45))
     fig.suptitle(title, fontsize=30)
 
     for x in range(1, len(columnsList)):
-        plotNumber = 'ax'+str(x)
+        plotNumber = 'ax' + str(x)
         colname = plotData.columns[x]
 
-        plotNumber = fig.add_subplot(graphRowCount,3,x)
+        plotNumber = fig.add_subplot(graphRowCount, 3, x)
         plotNumber.set_title(colname)
         plotNumber.plot(plotData.iloc[:, 1],
-             plotData[colname])
+                        plotData[colname])
         plt.xticks(rotation=45)
 
     plt.show()
 
 
 def calculateMetrics(balanceSheet, incomeStatement):
-    balanceSheet = balanceSheet
-    incomeStatement = incomeStatement
-
     frames = [balanceSheet, incomeStatement]
     Ratio = pd.DataFrame()
     dataframeForRatio = pd.concat(frames)
@@ -151,7 +157,7 @@ def calculateMetrics(balanceSheet, incomeStatement):
     Ratio['operating_margin_ratio'] = dataframeForRatio['net_income'] / dataframeForRatio['revenue']
     Ratio['return_on_assets_ratio'] = dataframeForRatio['net_income'] / dataframeForRatio['revenue']
     Ratio['return_on_equity_ratio'] = dataframeForRatio['net_income'] / (
-                dataframeForRatio['revenue'] - dataframeForRatio['total_liabilities'])
+            dataframeForRatio['revenue'] - dataframeForRatio['total_liabilities'])
     Ratio['net_working_capital'] = dataframeForRatio['total_current_assets'] - dataframeForRatio['total_liabilities']
     Ratio['operating_margin'] = dataframeForRatio['operating_income_(loss)'] / dataframeForRatio['revenue']
     Ratio['retention_ratio'] = dataframeForRatio['retained_earnings'] / dataframeForRatio['revenue']
@@ -159,28 +165,30 @@ def calculateMetrics(balanceSheet, incomeStatement):
     Ratio = Ratio.T
     Ratio = Ratio.round(4)
     return Ratio
-    
-def bulletChart(file,item):
+
+
+def bulletChart(file, item):
     statement = prep_dataframe(file)
-    
+
     data = statement.T
     data = data.reset_index()
     data = data.sort_values(by='index', ascending=False)
-    avg_item = 'avg_'+item
+    avg_item = 'avg_' + item
     data[avg_item] = data[item].mean()
     data = data.round(2)
     data = data.iloc[0]
-    
+
     fig = go.Figure(go.Indicator(
-        mode = "number+gauge+delta",
-        gauge = {'shape': "bullet"},
-        value = data[item],
-        delta = {'reference': data[avg_item]},
-        domain = {'x': [0, 1], 'y': [0, 1]},
-        title = {'text': item}))
-    fig.update_layout(height = 250)
-    
+        mode="number+gauge+delta",
+        gauge={'shape': "bullet"},
+        value=data[item],
+        delta={'reference': data[avg_item]},
+        domain={'x': [0, 1], 'y': [0, 1]},
+        title={'text': item}))
+    fig.update_layout(height=250)
+
     fig.show()
+
 
 def horizontalAnalysisLastTwo(dataframe):
     statement = dataframe
@@ -188,24 +196,33 @@ def horizontalAnalysisLastTwo(dataframe):
     statement_lastPeriods = statement[statement.columns[-2:]]
     statement_lastPeriods_lastColName = statement[statement_lastPeriods.columns[-1:]].columns.values[0]
     statement_lastPeriods_secondLastColName = statement[statement_lastPeriods.columns[-2:-1]].columns.values[0]
-    statement_lastPeriods['Amount(Increased/Decreased)'] = statement_lastPeriods[statement_lastPeriods_lastColName]-statement_lastPeriods[statement_lastPeriods_secondLastColName]
-    statement_lastPeriods['Percentage(Increased/Decreased)'] = (statement_lastPeriods[statement_lastPeriods_lastColName]/statement_lastPeriods[statement_lastPeriods_secondLastColName])-1
+    statement_lastPeriods['Amount(Increased/Decreased)'] = statement_lastPeriods[statement_lastPeriods_lastColName] - \
+                                                           statement_lastPeriods[
+                                                               statement_lastPeriods_secondLastColName]
+    statement_lastPeriods['Percentage(Increased/Decreased)'] = (statement_lastPeriods[
+                                                                    statement_lastPeriods_lastColName] /
+                                                                statement_lastPeriods[
+                                                                    statement_lastPeriods_secondLastColName]) - 1
     statement_lastPeriods = statement_lastPeriods.dropna()
-    statement_lastPeriods['Percentage(Increased/Decreased)'] = pd.Series(["{0:.2f}%".format(val * 100) for val in statement_lastPeriods['Percentage(Increased/Decreased)']], index = statement_lastPeriods.index)
+    statement_lastPeriods['Percentage(Increased/Decreased)'] = pd.Series(
+        ["{0:.2f}%".format(val * 100) for val in statement_lastPeriods['Percentage(Increased/Decreased)']],
+        index=statement_lastPeriods.index)
     statement_lastPeriods.to_csv('horizontalAnalysisLastTwo.csv')
     print("Horizontal Analysis with Last two Periods", statement_lastPeriods, sep='\n')
 
-def _process_symbol(symbol: str):
-    df_income= get_annual_finData_by_symbol('income',symbol,'us')
-    df_balancesheet = get_annual_finData_by_symbol('balancesheet',symbol,'us')
 
-    ret = calculateMetrics(df_balancesheet,df_income)
+def _process_symbol(symbol: str):
+    df_income = get_annual_finData_by_symbol('income', symbol, 'us')
+    df_balancesheet = get_annual_finData_by_symbol('balancesheet', symbol, 'us')
+
+    ret = calculateMetrics(df_balancesheet, df_income)
     ret = ret.T
     ret = ret.reset_index()
     ret = ret.rename(columns={'breakdown': 'fiscal_year'})
     ret.insert(0, 'Ticker', symbol)
-    ret = ret.set_index(['Ticker','fiscal_year'])
+    ret = ret.set_index(['Ticker', 'fiscal_year'])
     return ret
+
 
 def calculate_ratio_mass(symbols):
     concate = pd.DataFrame()
