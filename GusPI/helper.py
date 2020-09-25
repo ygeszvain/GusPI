@@ -12,20 +12,20 @@ def _fit_predict_model(dataframe, interval_width=0.99, changepoint_range=0.8):
     m = m.fit(dataframe)
 
     pred = m.predict(dataframe)
-    pred['fact'] = dataframe['y'].reset_index(drop=True)
+    pred['mark'] = dataframe['y'].reset_index(drop=True)
     return pred
 
 def _detect_anomalies(pred):
-    forecasted = pred[['ds', 'trend', 'yhat', 'yhat_lower', 'yhat_upper', 'fact']].copy()
+    predicted = pred[['ds', 'trend', 'yhat', 'yhat_lower', 'yhat_upper', 'mark']].copy()
 
-    forecasted['anomaly'] = 0
-    forecasted.loc[forecasted['fact'] > forecasted['yhat_upper'], 'anomaly'] = 1
-    forecasted.loc[forecasted['fact'] < forecasted['yhat_lower'], 'anomaly'] = -1
+    predicted['anomaly'] = 0
+    predicted.loc[predicted['mark'] > predicted['yhat_upper'], 'anomaly'] = 1
+    predicted.loc[predicted['mark'] < predicted['yhat_lower'], 'anomaly'] = -1
 
-    forecasted['importance'] = 0
-    forecasted.loc[forecasted['anomaly'] == 1, 'importance'] = \
-        (forecasted['fact'] - forecasted['yhat_upper']) / forecast['fact']
-    forecasted.loc[forecasted['anomaly'] == -1, 'importance'] = \
-        (forecasted['yhat_lower'] - forecasted['fact']) / forecast['fact']
+    predicted['importance'] = 0
+    predicted.loc[predicted['anomaly'] == 1, 'importance'] = \
+        (predicted['mark'] - predicted['yhat_upper']) / forecast['mark']
+    predicted.loc[predicted['anomaly'] == -1, 'importance'] = \
+        (predicted['yhat_lower'] - predicted['mark']) / forecast['mark']
 
-    return forecasted
+    return predicted
