@@ -113,6 +113,7 @@ def plot_benfordlaw(result, title='', figsize=(15, 8)):
 
     return fig, ax
 
+
 def annomalies_detection(df, colname, target):
     df = df.loc[df[colname] == target]
     df = df[['date', colname]]
@@ -121,8 +122,8 @@ def annomalies_detection(df, colname, target):
     df = df.reset_index()
     df = df.dropna()
     df.columns = ['ds', 'y']
-    pred = _fit_predict_model(df)
-    pred = _detect_anomalies(pred)
+    pred = helper.fit_predict_model(df)
+    pred = helper.detect_anomalies(pred)
     pred_ano = pred.loc[pred['anomaly'] == 1]
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=pred['ds'], y=pred['fact'], name=target_col, mode='lines'))

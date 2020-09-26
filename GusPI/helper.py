@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 
 
-def _fit_predict_model(dataframe, interval_width=0.99, changepoint_range=0.8):
+def fit_predict_model(dataframe, interval_width=0.99, changepoint_range=0.8):
     m = Prophet(daily_seasonality=False, yearly_seasonality=False, weekly_seasonality=False,
                 seasonality_mode='multiplicative',
                 interval_width=interval_width,
@@ -15,7 +15,7 @@ def _fit_predict_model(dataframe, interval_width=0.99, changepoint_range=0.8):
     pred['mark'] = dataframe['y'].reset_index(drop=True)
     return pred
 
-def _detect_anomalies(pred):
+def detect_anomalies(pred):
     predicted = pred[['ds', 'trend', 'yhat', 'yhat_lower', 'yhat_upper', 'mark']].copy()
 
     predicted['anomaly'] = 0
