@@ -142,8 +142,8 @@ def _detect_anomalies(pred):
     return predicted
 
 
-def anomalies_detection(df, col_to_filter, target_col, target):
-    df = df.loc[df[col_to_filter] == target]
+def anomalies_detection(df, col_to_filter, filter_value, target_col):
+    df = df.loc[df[col_to_filter] == filter_value]
     df = df[['date', target_col]]
     df['date'] = pd.to_datetime(df['date'], errors='coerce')
     df = df.set_index('date').groupby(pd.Grouper(freq='D')).max()
