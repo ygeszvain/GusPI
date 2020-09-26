@@ -114,6 +114,7 @@ def plot_benfordlaw(result, title='', figsize=(15, 8)):
 
     return fig, ax
 
+
 def _fit_predict_model(dataframe, interval_width=0.99, changepoint_range=0.8):
     m = Prophet(daily_seasonality=False, yearly_seasonality=False, weekly_seasonality=False,
                 seasonality_mode='multiplicative',
@@ -124,6 +125,7 @@ def _fit_predict_model(dataframe, interval_width=0.99, changepoint_range=0.8):
     pred = m.predict(dataframe)
     pred['mark'] = dataframe['y'].reset_index(drop=True)
     return pred
+
 
 def _detect_anomalies(pred):
     predicted = pred[['ds', 'trend', 'yhat', 'yhat_lower', 'yhat_upper', 'mark']].copy()
@@ -141,7 +143,7 @@ def _detect_anomalies(pred):
     return predicted
 
 
-def annomalies_detection(df, colname, target):
+def anomalies_detection(df, colname, target):
     df = df.loc[df[colname] == target]
     df = df[['date', colname]]
     df['date'] = pd.to_datetime(df['date'], errors='coerce')
