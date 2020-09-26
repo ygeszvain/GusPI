@@ -135,16 +135,16 @@ def _detect_anomalies(pred):
 
     predicted['importance'] = 0
     predicted.loc[predicted['anomaly'] == 1, 'importance'] = \
-        (predicted['mark'] - predicted['yhat_upper']) / forecast['mark']
+        (predicted['mark'] - predicted['yhat_upper']) / predicted['mark']
     predicted.loc[predicted['anomaly'] == -1, 'importance'] = \
-        (predicted['yhat_lower'] - predicted['mark']) / forecast['mark']
+        (predicted['yhat_lower'] - predicted['mark']) / predicted['mark']
 
     return predicted
 
 
-def anomalies_detection(df, colname, target):
-    df = df.loc[df[colname] == target]
-    df = df[['date', colname]]
+def anomalies_detection(df, target_col, target):
+    df = df.loc[df['product_number']  == target]
+    df = df[['date', target_col]]
     df['date'] = pd.to_datetime(df['date'], errors='coerce')
     df = df.set_index('date').groupby(pd.Grouper(freq='D')).max()
     df = df.reset_index()
@@ -154,8 +154,8 @@ def anomalies_detection(df, colname, target):
     pred = _detect_anomalies(pred)
     pred_ano = pred.loc[pred['anomaly'] == 1]
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=pred['ds'], y=pred['fact'], name=target_col, mode='lines'))
+    fig.add_trace(go.Scatter(x=pred['ds'], y=pred['mark'], name=target_col, mode='lines'))
     fig.add_trace(
-        go.Scatter(x=pred_ano['ds'], y=pred_ano['fact'], mode='markers', name='Anomaly', marker=dict(color='red')))
+        go.Scatter(x=pred_ano['ds'], y=pred_ano['mark'], mode='markers', name='Anomaly', marker=dict(color='red')))
     fig.update_layout(showlegend=True, title='Detected Anomalies')
     fig.show()
