@@ -2,12 +2,14 @@ import os
 from scipy.stats import chisquare
 from scipy.stats import ks_2samp
 from scipy.stats import combine_pvalues
+import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import helper
 
 
-def init_benfordlaw(df, colname, target, target_value):
+def init_df(df, colname, target, target_value):
     value_arr = df[colname].loc[df[target] == target_value].values
     return value_arr
 
@@ -110,3 +112,21 @@ def plot_benfordlaw(result, title='', figsize=(15, 8)):
     plt.show()
 
     return fig, ax
+
+def annomalies_detection(df, colname, target):
+    df = df.loc[df[colname] == target]
+    df = df[['date', colname]]
+    df['date'] = pd.to_datetime(df['date'], errors='coerce')
+    df = df.set_index('date').groupby(pd.Grouper(freq='D')).max()
+    df = df.reset_index()
+    df = df.dropna()
+    df.columns = ['ds', 'y']
+    pred = _fit_predict_model(df)
+    pred = _detect_anomalies(pred)
+    pred_ano = pred.loc[pred['anomaly'] == 1]
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=pred['ds'], y=pred['fact'], name=target_col, mode='lines'))
+    fig.add_trace(
+        go.Scatter(x=pred_ano['ds'], y=pred_ano['fact'], mode='markers', name='Anomaly', marker=dict(color='red')))
+    fig.update_layout(showlegend=True, title='Detected Anomalies')
+    fig.show()
